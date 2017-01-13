@@ -21,6 +21,15 @@ import com.hankcs.hanlp.corpus.util.CustomNatureUtility;
 public enum Nature
 {
     /**
+     * 自定义词性
+     */
+    // F财经
+    fcaijing,
+    
+    // 乐哈网
+    leha,
+
+    /**
      * 区别语素
      */
     bg,

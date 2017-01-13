@@ -46,9 +46,59 @@ public class CustomDictionary
      */
     public final static String path[] = HanLP.Config.CustomDictionaryPath;
 
+    /**
+    * 用户自定义词典名称
+    */
+    public static String dynamicDictPath = null;
+
+
+    /**
+    * 动态自定义词典数组
+    */
+    private static List<String> dynamicPaths = new ArrayList();
+
+
+    /**
+     * 根据自定义参数加载自定义词典
+     */
+    public static boolean loadDynamicDict(String dynamicPath){
+        logger.info("loadDynamicDict " + dynamicPath);
+
+        // 已经加载过，不必重新加载 
+        if (dynamicPath != null && dynamicPath.equalsIgnoreCase(dynamicDictPath)){
+            logger.info("loadDynamicDict 之前已加载，不必重复加载" + dynamicPath);
+            return true;
+        }
+
+        dynamicDictPath = dynamicPath;
+
+        // 清除旧数据
+        trie = null;
+        dat.clear();
+
+        try{
+            // 清除缓存
+            File cacheFile = new File(path[0] + Predefine.BIN_EXT);
+            if (cacheFile.isFile() && cacheFile.exists()){
+                cacheFile.delete();
+            }
+        } catch( Exception e){
+
+        }
+
+        // 重新加载系统自定义数据
+        doLoadMainDictionary(); 
+    
+        return true;
+    }
+
     // 自动加载词典
     static
     {
+        doLoadMainDictionary();
+    }
+
+    private static void doLoadMainDictionary(){
         long start = System.currentTimeMillis();
         if (!loadMainDictionary(path[0]))
         {
@@ -64,13 +114,20 @@ public class CustomDictionary
     {
         logger.info("自定义词典开始加载:" + mainPath);
         if (loadDat(mainPath)) return true;
+
+        List<String> pathList = new ArrayList(Arrays.asList(path));
+        if (dynamicDictPath != null){
+            pathList.add(dynamicDictPath);
+        }
+
         dat = new DoubleArrayTrie<CoreDictionary.Attribute>();
         TreeMap<String, CoreDictionary.Attribute> map = new TreeMap<String, CoreDictionary.Attribute>();
         LinkedHashSet<Nature> customNatureCollector = new LinkedHashSet<Nature>();
         try
         {
-            for (String p : path)
+            for (String p : pathList)
             {
+                logger.info("开始加载" + p);
                 Nature defaultNature = Nature.n;
                 int cut = p.indexOf(' ');
                 if (cut > 0)

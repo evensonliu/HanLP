@@ -282,7 +282,7 @@ public class DoubleArrayTrie<V> implements Serializable, ITrie<V>
     // set_array omitted
     // array omitted
 
-    void clear()
+    public void clear()
     {
         // if (! no_delete_)
         check = null;
