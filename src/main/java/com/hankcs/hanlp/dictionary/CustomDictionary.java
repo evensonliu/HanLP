@@ -70,21 +70,21 @@ public class CustomDictionary
             return true;
         }
 
-        dynamicDictPath = dynamicPath;
-
         // 清除旧数据
         trie = null;
         dat.clear();
+//
+//        try{
+//            // 清除缓存
+//            File cacheFile = new File(path[0] + Predefine.BIN_EXT);
+//            if (cacheFile.isFile() && cacheFile.exists()){
+//                cacheFile.delete();
+//            }
+//        } catch( Exception e){
+//            logger.severe("清除缓存出错"  + e);
+//        }
 
-        try{
-            // 清除缓存
-            File cacheFile = new File(path[0] + Predefine.BIN_EXT);
-            if (cacheFile.isFile() && cacheFile.exists()){
-                cacheFile.delete();
-            }
-        } catch( Exception e){
-
-        }
+        dynamicDictPath = dynamicPath;
 
         // 重新加载系统自定义数据
         doLoadMainDictionary(); 
@@ -100,7 +100,23 @@ public class CustomDictionary
 
     private static void doLoadMainDictionary(){
         long start = System.currentTimeMillis();
-        if (!loadMainDictionary(path[0]))
+       
+        // 提取主自定义文件路径 
+        String mainPath = null;
+
+        if (dynamicDictPath != null){
+            int cut = dynamicDictPath.indexOf(' ');
+            if (cut > 0){
+                // 有默认词性
+                mainPath = dynamicDictPath.substring(0, cut);
+            }else{
+                mainPath = dynamicDictPath;
+            }
+        }else{
+            mainPath = path[0];
+        }
+       
+        if (!loadMainDictionary(mainPath))
         {
             logger.warning("自定义词典" + Arrays.toString(path) + "加载失败");
         }
