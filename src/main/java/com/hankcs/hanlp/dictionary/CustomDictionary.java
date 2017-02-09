@@ -60,12 +60,24 @@ public class CustomDictionary
 
     /**
      * 根据自定义参数加载自定义词典
+     * 参数：
+     * 		dynamicPath， 自定义字典的位置
      */
     public static boolean loadDynamicDict(String dynamicPath){
+        return loadDynamicDict(dynamicPath, false);
+    }
+
+    /**
+     * 根据自定义参数加载自定义词典
+     * 参数：
+     * 		dynamicPath， 自定义字典的位置
+     * 		forceRebuild， 是否重建索引文件
+     */
+    public static boolean loadDynamicDict(String dynamicPath, boolean forceRebuild){
         logger.info("loadDynamicDict " + dynamicPath);
 
         // 已经加载过，不必重新加载 
-        if (dynamicPath != null && dynamicPath.equalsIgnoreCase(dynamicDictPath)){
+        if (!forceRebuild && dynamicPath != null && dynamicPath.equalsIgnoreCase(dynamicDictPath)){
             logger.info("loadDynamicDict 之前已加载，不必重复加载" + dynamicPath);
             return true;
         }
@@ -73,19 +85,30 @@ public class CustomDictionary
         // 清除旧数据
         trie = null;
         dat.clear();
-//
-//        try{
-//            // 清除缓存
-//            File cacheFile = new File(path[0] + Predefine.BIN_EXT);
-//            if (cacheFile.isFile() && cacheFile.exists()){
-//                cacheFile.delete();
-//            }
-//        } catch( Exception e){
-//            logger.severe("清除缓存出错"  + e);
-//        }
+        
+        if (forceRebuild){
+            // 清除缓存
+	        try{
+	        	// 自定义文件文件路径
+	        	String fileName = "";
+	            int cut = dynamicPath.indexOf(' ');
+	            if (cut > 0){
+	            	fileName = dynamicPath.substring(0, cut);
+	            }else{
+	            	fileName = dynamicPath;
+	            }
+	            
+	            // 删除缓存文件
+	            File cacheFile = new File(fileName + Predefine.BIN_EXT);
+	            if (cacheFile.isFile() && cacheFile.exists()){
+	                cacheFile.delete();
+	            }
+	        } catch( Exception e){
+	            logger.severe("清除缓存出错"  + e);
+	        }
+        }
 
         dynamicDictPath = dynamicPath;
-
         // 重新加载系统自定义数据
         doLoadMainDictionary(); 
     
