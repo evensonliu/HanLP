@@ -26,6 +26,12 @@ public enum Nature
     // F财经
     fcaijing,
     
+    // 药品
+    drug,
+    
+    // 疾病
+    ill,
+    
     // 乐哈网
     leha,
 
